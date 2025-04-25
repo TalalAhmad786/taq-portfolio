@@ -34,7 +34,13 @@ const Projects = ({ onOpenProject }: ProjectsProps) => {
           {projects.map((project, index) => (
             <motion.div 
               key={index}
-              className="rounded-xl overflow-hidden glass group"
+              className={`rounded-xl overflow-hidden glass group ${
+                index % 3 === 0 
+                  ? "purple-glow" 
+                  : index % 3 === 1 
+                  ? "teal-glow" 
+                  : "green-glow"
+              }`}
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -44,13 +50,6 @@ const Projects = ({ onOpenProject }: ProjectsProps) => {
                 rotateX: 5,
                 boxShadow: "0 10px 25px rgba(0, 0, 0, 0.2)"
               }}
-              className={
-                index % 3 === 0 
-                  ? "purple-glow" 
-                  : index % 3 === 1 
-                  ? "teal-glow" 
-                  : "green-glow"
-              }
             >
               <div className="relative overflow-hidden">
                 <img 
