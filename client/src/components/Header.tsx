@@ -40,12 +40,10 @@ const Header = () => {
       >
         <div className="container mx-auto px-6">
           <nav className="flex justify-between items-center">
-            <Link href="/">
-              <a className="text-xl font-bold font-heading text-white flex items-center">
+            <Link href="/" className="text-xl font-bold font-heading text-white flex items-center">
                 <span className="text-primary">&lt;</span>
                 John<span className="text-secondary">Smith</span>
                 <span className="text-primary">/&gt;</span>
-              </a>
             </Link>
             
             {/* Desktop Navigation */}
