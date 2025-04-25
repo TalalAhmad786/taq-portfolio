@@ -125,7 +125,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await sendNewCaseStudyNotification(
         createdCaseStudy.title, 
         createdCaseStudy.slug, 
-        createdCaseStudy.client
+        createdCaseStudy.clientName
       );
       
       res.status(201).json(createdCaseStudy);
@@ -265,9 +265,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/admin/settings/:key", async (req: Request, res: Response) => {
     try {
       const { key } = req.params;
-      const { value, category } = insertSettingSchema.parse(req.body);
+      const { value, category, type = 'text', description = '' } = insertSettingSchema.parse(req.body);
       
-      const setting = await storage.saveSetting({ key, value, category });
+      const setting = await storage.saveSetting({ key, value, category, type, description });
       res.json(setting);
     } catch (error) {
       if (error instanceof z.ZodError) {

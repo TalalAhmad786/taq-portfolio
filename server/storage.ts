@@ -11,6 +11,9 @@ import { db } from "./db";
 import { eq, desc, asc } from "drizzle-orm";
 import { pool } from "./db";
 
+const PgStore = connectPg(session);
+type SessionStore = InstanceType<typeof PgStore>;
+
 // Interface with full CRUD operations for all entities
 export interface IStorage {
   // User operations
@@ -40,16 +43,14 @@ export interface IStorage {
   saveSetting(setting: InsertSetting): Promise<SiteSetting>;
   
   // Session store for auth
-  sessionStore: session.SessionStore;
+  sessionStore: SessionStore;
 }
 
-const PostgresSessionStore = connectPg(session);
-
 export class DatabaseStorage implements IStorage {
-  sessionStore: session.SessionStore;
+  sessionStore: SessionStore;
   
   constructor() {
-    this.sessionStore = new PostgresSessionStore({ 
+    this.sessionStore = new PgStore({ 
       pool, 
       createTableIfMissing: true 
     });
