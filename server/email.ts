@@ -1,10 +1,15 @@
 import sgMail from '@sendgrid/mail';
 
-// Check if the SendGrid API key is set
+// Check if the SendGrid API key is set and valid
 if (!process.env.SENDGRID_API_KEY) {
   console.warn('SENDGRID_API_KEY not set. Email functionality will not work.');
 } else {
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  try {
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  } catch (error) {
+    console.error('Error setting SendGrid API key:', error);
+    console.warn('Please ensure your SendGrid API key is valid and starts with "SG."');
+  }
 }
 
 interface EmailData {
@@ -25,10 +30,33 @@ export async function sendEmail(emailData: EmailData): Promise<boolean> {
       return false;
     }
     
-    await sgMail.send(emailData);
-    return true;
+    // Validate sender email
+    if (emailData.from !== 'talal.ahmad.qamar@gmail.com') {
+      console.error('Invalid sender email. Must use a verified sender.');
+      return false;
+    }
+    
+    // In development environment, we'll log the email instead of sending it
+    if (process.env.NODE_ENV === 'development') {
+      console.log('==== EMAIL WOULD BE SENT (DEVELOPMENT MODE) ====');
+      console.log('To:', emailData.to);
+      console.log('From:', emailData.from);
+      console.log('Subject:', emailData.subject);
+      console.log('Text:', emailData.text);
+      // Using a fallback to prevent actual sending in dev
+      return true;
+    }
+    
+    try {
+      await sgMail.send(emailData);
+      console.log('Email sent successfully to', emailData.to);
+      return true;
+    } catch (sendError: any) {
+      console.error('SendGrid error:', sendError?.response?.body || sendError);
+      return false;
+    }
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('Error in sendEmail function:', error);
     return false;
   }
 }

@@ -84,17 +84,32 @@ export class DatabaseStorage implements IStorage {
   }
   
   async getCaseStudies(limit?: number, featured?: boolean): Promise<CaseStudy[]> {
-    let query = db.select().from(caseStudies).orderBy(desc(caseStudies.publishDate));
-    
+    // Build query based on conditions
     if (featured !== undefined) {
-      query = query.where(eq(caseStudies.featured, featured));
+      if (limit) {
+        return await db.select()
+          .from(caseStudies)
+          .where(eq(caseStudies.featured, featured))
+          .orderBy(desc(caseStudies.publishDate))
+          .limit(limit);
+      } else {
+        return await db.select()
+          .from(caseStudies)
+          .where(eq(caseStudies.featured, featured))
+          .orderBy(desc(caseStudies.publishDate));
+      }
+    } else {
+      if (limit) {
+        return await db.select()
+          .from(caseStudies)
+          .orderBy(desc(caseStudies.publishDate))
+          .limit(limit);
+      } else {
+        return await db.select()
+          .from(caseStudies)
+          .orderBy(desc(caseStudies.publishDate));
+      }
     }
-    
-    if (limit) {
-      query = query.limit(limit);
-    }
-    
-    return await query;
   }
   
   async createCaseStudy(caseStudy: InsertCaseStudy): Promise<CaseStudy> {
@@ -118,17 +133,32 @@ export class DatabaseStorage implements IStorage {
   
   // Contact message operations
   async getContactMessages(limit?: number, unreadOnly?: boolean): Promise<ContactMessage[]> {
-    let query = db.select().from(contactMessages).orderBy(desc(contactMessages.createdAt));
-    
+    // Build query based on conditions
     if (unreadOnly) {
-      query = query.where(eq(contactMessages.read, false));
+      if (limit) {
+        return await db.select()
+          .from(contactMessages)
+          .where(eq(contactMessages.read, false))
+          .orderBy(desc(contactMessages.createdAt))
+          .limit(limit);
+      } else {
+        return await db.select()
+          .from(contactMessages)
+          .where(eq(contactMessages.read, false))
+          .orderBy(desc(contactMessages.createdAt));
+      }
+    } else {
+      if (limit) {
+        return await db.select()
+          .from(contactMessages)
+          .orderBy(desc(contactMessages.createdAt))
+          .limit(limit);
+      } else {
+        return await db.select()
+          .from(contactMessages)
+          .orderBy(desc(contactMessages.createdAt));
+      }
     }
-    
-    if (limit) {
-      query = query.limit(limit);
-    }
-    
-    return await query;
   }
   
   async getContactMessage(id: number): Promise<ContactMessage | undefined> {
