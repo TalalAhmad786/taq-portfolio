@@ -22,7 +22,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "../hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 
 const loginSchema = z.object({

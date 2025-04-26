@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "../hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -353,7 +353,7 @@ export default function AdminDashboard() {
   };
 
   if (!user) {
-    return null;
+    return <div></div>; // Return empty div instead of null
   }
 
   return (
