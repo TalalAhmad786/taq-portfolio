@@ -15,12 +15,10 @@ const Footer = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <Link href="/">
-              <a className="text-xl font-bold text-white flex items-center">
-                <span className="text-primary">&lt;</span>
-                John<span className="text-secondary">Smith</span>
-                <span className="text-primary">/&gt;</span>
-              </a>
+            <Link href="/" className="text-xl font-bold text-white flex items-center">
+              <span className="text-primary">&lt;</span>
+              John<span className="text-secondary">Smith</span>
+              <span className="text-primary">/&gt;</span>
             </Link>
           </motion.div>
           
