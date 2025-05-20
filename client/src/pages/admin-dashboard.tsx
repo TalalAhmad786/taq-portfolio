@@ -62,16 +62,25 @@ interface CaseStudy {
   id: number;
   title: string;
   slug: string;
+  excerpt: string;
   description: string;
-  content: string;
+  coverImage: string;
   clientName: string;
-  clientLogo?: string;
-  category: string;
-  technologies: string;
-  imageUrl: string;
+  clientIndustry: string;
+  duration?: string;
+  services: string[];
+  challenge: string;
+  solution: string;
+  result: string;
+  images?: string[];
+  technologies: string[];
+  testimonial?: string;
+  testimonialAuthor?: string;
+  testimonialRole?: string;
   featured: boolean;
-  order: number;
+  publishDate: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 interface ContactMessage {
@@ -96,15 +105,22 @@ interface SiteSetting {
 const caseStudySchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
   slug: z.string().min(3, "Slug must be at least 3 characters").regex(/^[a-z0-9-]+$/, "Slug must contain only lowercase letters, numbers, and hyphens"),
+  excerpt: z.string().min(10, "Excerpt must be at least 10 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
-  content: z.string().min(50, "Content must be at least 50 characters"),
+  coverImage: z.string().min(5, "Cover image URL must be at least 5 characters"),
   clientName: z.string().min(2, "Client name must be at least 2 characters"),
-  clientLogo: z.string().optional(),
-  category: z.string().min(2, "Category must be at least 2 characters"),
-  technologies: z.string().min(2, "Technologies must be at least 2 characters"),
-  imageUrl: z.string().min(5, "Image URL must be at least 5 characters"),
-  featured: z.boolean().default(false),
-  order: z.number().int().nonnegative("Order must be a non-negative number").default(0),
+  clientIndustry: z.string().min(2, "Client industry must be at least 2 characters"),
+  duration: z.string().optional(),
+  services: z.string().array().min(1, "At least one service is required"),
+  challenge: z.string().min(10, "Challenge must be at least 10 characters"),
+  solution: z.string().min(10, "Solution must be at least 10 characters"),
+  result: z.string().min(10, "Result must be at least 10 characters"),
+  images: z.string().array().optional(),
+  technologies: z.string().array().min(1, "At least one technology is required"),
+  testimonial: z.string().optional(),
+  testimonialAuthor: z.string().optional(),
+  testimonialRole: z.string().optional(),
+  featured: z.boolean().default(false)
 });
 
 type CaseStudyFormValues = z.infer<typeof caseStudySchema>;
@@ -150,15 +166,22 @@ export default function AdminDashboard() {
     defaultValues: {
       title: "",
       slug: "",
+      excerpt: "",
       description: "",
-      content: "",
+      coverImage: "",
       clientName: "",
-      clientLogo: "",
-      category: "",
-      technologies: "",
-      imageUrl: "",
-      featured: false,
-      order: 0,
+      clientIndustry: "",
+      duration: "",
+      services: [],
+      challenge: "",
+      solution: "",
+      result: "",
+      images: [],
+      technologies: [],
+      testimonial: "",
+      testimonialAuthor: "",
+      testimonialRole: "",
+      featured: false
     },
   });
 
@@ -168,29 +191,43 @@ export default function AdminDashboard() {
       caseStudyForm.reset({
         title: editingCaseStudy.title,
         slug: editingCaseStudy.slug,
+        excerpt: editingCaseStudy.excerpt || "",
         description: editingCaseStudy.description,
-        content: editingCaseStudy.content,
+        coverImage: editingCaseStudy.coverImage || "",
         clientName: editingCaseStudy.clientName,
-        clientLogo: editingCaseStudy.clientLogo || "",
-        category: editingCaseStudy.category,
-        technologies: editingCaseStudy.technologies,
-        imageUrl: editingCaseStudy.imageUrl,
-        featured: editingCaseStudy.featured,
-        order: editingCaseStudy.order,
+        clientIndustry: editingCaseStudy.clientIndustry || "",
+        duration: editingCaseStudy.duration || "",
+        services: editingCaseStudy.services || [],
+        challenge: editingCaseStudy.challenge || "",
+        solution: editingCaseStudy.solution || "",
+        result: editingCaseStudy.result || "",
+        images: editingCaseStudy.images || [],
+        technologies: editingCaseStudy.technologies || [],
+        testimonial: editingCaseStudy.testimonial || "",
+        testimonialAuthor: editingCaseStudy.testimonialAuthor || "",
+        testimonialRole: editingCaseStudy.testimonialRole || "",
+        featured: editingCaseStudy.featured || false
       });
     } else {
       caseStudyForm.reset({
         title: "",
         slug: "",
+        excerpt: "",
         description: "",
-        content: "",
+        coverImage: "",
         clientName: "",
-        clientLogo: "",
-        category: "",
-        technologies: "",
-        imageUrl: "",
-        featured: false,
-        order: 0,
+        clientIndustry: "",
+        duration: "",
+        services: [],
+        challenge: "",
+        solution: "",
+        result: "",
+        images: [],
+        technologies: [],
+        testimonial: "",
+        testimonialAuthor: "",
+        testimonialRole: "",
+        featured: false
       });
     }
   }, [editingCaseStudy, caseStudyForm]);
@@ -424,8 +461,8 @@ export default function AdminDashboard() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Title</TableHead>
-                        <TableHead>Category</TableHead>
                         <TableHead>Client</TableHead>
+                        <TableHead>Industry</TableHead>
                         <TableHead>Featured</TableHead>
                         <TableHead>Actions</TableHead>
                       </TableRow>
@@ -437,8 +474,8 @@ export default function AdminDashboard() {
                             <TableCell className="font-medium">
                               {study.title}
                             </TableCell>
-                            <TableCell>{study.category}</TableCell>
                             <TableCell>{study.clientName}</TableCell>
+                            <TableCell>{study.clientIndustry}</TableCell>
                             <TableCell>
                               {study.featured ? (
                                 <Badge variant="default">Featured</Badge>
@@ -741,20 +778,6 @@ export default function AdminDashboard() {
 
                 <FormField
                   control={caseStudyForm.control}
-                  name="category"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Category</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Web Development" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={caseStudyForm.control}
                   name="clientName"
                   render={({ field }) => (
                     <FormItem>
@@ -769,25 +792,10 @@ export default function AdminDashboard() {
 
                 <FormField
                   control={caseStudyForm.control}
-                  name="clientLogo"
+                  name="coverImage"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Client Logo URL</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://example.com/logo.png" {...field} />
-                      </FormControl>
-                      <FormDescription>Optional</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={caseStudyForm.control}
-                  name="imageUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Featured Image URL</FormLabel>
+                      <FormLabel>Cover Image URL</FormLabel>
                       <FormControl>
                         <Input placeholder="https://example.com/image.jpg" {...field} />
                       </FormControl>
@@ -803,29 +811,13 @@ export default function AdminDashboard() {
                     <FormItem>
                       <FormLabel>Technologies</FormLabel>
                       <FormControl>
-                        <Input placeholder="React, Node.js, PostgreSQL" {...field} />
-                      </FormControl>
-                      <FormDescription>Comma separated list</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={caseStudyForm.control}
-                  name="order"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Display Order</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="number" 
-                          min="0"
-                          {...field} 
-                          onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        <Input
+                          placeholder="React, Node.js, PostgreSQL"
+                          value={field.value.join(", ")}
+                          onChange={(e) => field.onChange(e.target.value.split(',').map(t => t.trim()))}
                         />
                       </FormControl>
-                      <FormDescription>Lower numbers appear first</FormDescription>
+                      <FormDescription>Comma separated list</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -853,44 +845,198 @@ export default function AdminDashboard() {
                 />
               </div>
 
-              <FormField
-                control={caseStudyForm.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Short Description</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="A brief description of the project" 
-                        className="min-h-[80px]"
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-1 gap-6">
+                <FormField
+                  control={caseStudyForm.control}
+                  name="excerpt"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Excerpt</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="A brief excerpt for previews"
+                          className="min-h-[80px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={caseStudyForm.control}
-                name="content"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Full Content</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Detailed description of the project" 
-                        className="min-h-[200px]"
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Markdown is supported
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={caseStudyForm.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="A detailed description of the project"
+                          className="min-h-[120px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={caseStudyForm.control}
+                  name="clientIndustry"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Client Industry</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Technology, Healthcare, etc." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={caseStudyForm.control}
+                  name="duration"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Project Duration</FormLabel>
+                      <FormControl>
+                        <Input placeholder="3 months, 1 year, etc." {...field} />
+                      </FormControl>
+                      <FormDescription>Optional</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={caseStudyForm.control}
+                  name="services"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Services Provided</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="Web Development, UI/UX Design"
+                          value={field.value.join(", ")}
+                          onChange={(e) => field.onChange(e.target.value.split(',').map(s => s.trim()))}
+                        />
+                      </FormControl>
+                      <FormDescription>Comma separated list</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={caseStudyForm.control}
+                  name="challenge"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Challenge</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="What challenges did the client face?"
+                          className="min-h-[120px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={caseStudyForm.control}
+                  name="solution"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Solution</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="How did you solve the challenges?"
+                          className="min-h-[120px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={caseStudyForm.control}
+                  name="result"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Results</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="What were the outcomes of the project?"
+                          className="min-h-[120px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={caseStudyForm.control}
+                    name="testimonial"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Client Testimonial</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="What did the client say about the project?"
+                            className="min-h-[120px]"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormDescription>Optional</FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="space-y-6">
+                    <FormField
+                      control={caseStudyForm.control}
+                      name="testimonialAuthor"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Testimonial Author</FormLabel>
+                          <FormControl>
+                            <Input placeholder="John Doe" {...field} />
+                          </FormControl>
+                          <FormDescription>Optional</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={caseStudyForm.control}
+                      name="testimonialRole"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Testimonial Author Role</FormLabel>
+                          <FormControl>
+                            <Input placeholder="CEO, Project Manager" {...field} />
+                          </FormControl>
+                          <FormDescription>Optional</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              </div>
 
               <DialogFooter>
                 <Button 

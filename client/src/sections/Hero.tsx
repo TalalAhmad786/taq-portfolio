@@ -1,14 +1,29 @@
 import { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 const Hero = () => {
   const typingTextRef = useRef<HTMLParagraphElement>(null);
+  const { scrollYProgress } = useScroll();
+  
+  // Fade out the scroll button based on scroll
+  const scrollButtonOpacity = useTransform(
+    scrollYProgress,
+    [0, 0.05],
+    [1, 0]
+  );
+  
+  const scrollToAbout = () => {
+    const aboutSection = document.querySelector("#about");
+    if (aboutSection) {
+      aboutSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
   
   // Typing effect animation
   useEffect(() => {
     if (!typingTextRef.current) return;
     
-    const text = "Frontend Developer & UI/UX Designer";
+    const text = "A";
     const typingSpeed = 100; // ms per character
     
     let charIndex = 0;
@@ -50,7 +65,7 @@ const Hero = () => {
           >
             <p className="text-lg md:text-xl text-secondary mb-4">Hello, I'm</p>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-              John Smith
+              Talal Ahmad
             </h1>
             
             <div className="mb-8">
@@ -58,7 +73,7 @@ const Hero = () => {
                 ref={typingTextRef}
                 className="text-xl md:text-2xl text-primary overflow-hidden whitespace-nowrap border-r-4 border-white animate-[blink_0.75s_step-end_infinite]"
               >
-                Frontend Developer & UI/UX Designer
+                A Full Stack Developer
               </p>
             </div>
             
@@ -175,8 +190,8 @@ const Hero = () => {
             >
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary to-secondary opacity-20 blur-xl"></div>
               <img 
-                src="https://images.unsplash.com/photo-1596075780750-81249df16d19?auto=format&fit=crop&q=80&w=500&h=500" 
-                alt="John Smith" 
+                src="https://iili.io/3VIUMue.jpg" 
+                alt="Talal Ahmad" 
                 className="w-full h-full object-cover rounded-full border-4 border-primary/50"
               />
               
@@ -230,32 +245,104 @@ const Hero = () => {
         </div>
       </div>
       
+      {/* Scroll Down Button */}
       <motion.div 
-        className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
-        animate={{ y: [0, 10, 0] }}
-        transition={{ 
-          duration: 1.5, 
-          repeat: Infinity,
-          repeatType: "reverse", 
-          ease: "easeInOut" 
-        }}
+        style={{ opacity: scrollButtonOpacity }}
+        className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 2, duration: 0.5 }}
       >
-        <a href="#about" className="flex flex-col items-center text-white opacity-70 hover:opacity-100 transition duration-300">
-          <span className="mb-2">Scroll Down</span>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+        <motion.div 
+          className="flex flex-col items-center gap-2"
+          animate={{
+            y: [0, 5, 0],
+          }}
+          transition={{
+            duration: 2.5,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        >
+          <motion.p 
+            className="text-sm font-medium bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{
+              duration: 1,
+              delay: 2.5,
+              repeat: Infinity,
+              repeatType: "reverse"
+            }}
           >
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
-        </a>
+            Explore More
+          </motion.p>
+          
+          <motion.button
+            onClick={scrollToAbout}
+            className="group relative flex flex-col items-center justify-start overflow-hidden w-8 h-14 rounded-full border-2 border-primary/50 hover:border-secondary/50 bg-background/50 backdrop-blur-sm transition-colors duration-500"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            {/* Animated dot */}
+            <motion.div
+              className="w-1.5 h-1.5 my-2 rounded-full bg-gradient-to-r from-primary to-secondary"
+              animate={{
+                y: [0, 24, 0],
+                scale: [1, 0.8, 1]
+              }}
+              transition={{
+                duration: 2.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+            
+            {/* Mouse wheel effect */}
+            <motion.div
+              className="absolute top-[6px] left-1/2 w-4 h-4 -translate-x-1/2 border-t-2 border-primary/50 rounded-full"
+              animate={{
+                rotate: [0, 360]
+              }}
+              transition={{
+                duration: 5,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+            />
+            
+            {/* Glow effects */}
+            <motion.div
+              className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              animate={{
+                boxShadow: [
+                  "0 0 0 0 rgba(139, 92, 246, 0)",
+                  "0 0 20px 3px rgba(139, 92, 246, 0.3)",
+                  "0 0 0 0 rgba(139, 92, 246, 0)"
+                ]
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+          </motion.button>
+        </motion.div>
+        
+        {/* Scroll path indication */}
+        <motion.div 
+          className="absolute -z-10 w-px h-24 bottom-0 bg-gradient-to-b from-primary/20 via-secondary/20 to-transparent"
+          animate={{
+            scaleY: [0.3, 1, 0.3],
+            opacity: [0.3, 0.6, 0.3]
+          }}
+          transition={{
+            duration: 2.5,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
       </motion.div>
     </section>
   );

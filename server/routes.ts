@@ -60,10 +60,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Public case studies endpoints
   app.get("/api/case-studies", async (req: Request, res: Response) => {
     try {
-      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
-      const featured = req.query.featured === "true";
-      
-      const caseStudies = await storage.getCaseStudies(limit, featured);
+      const caseStudies = await storage.getCaseStudies();
       res.json(caseStudies);
     } catch (error) {
       console.error("Error fetching case studies:", error);

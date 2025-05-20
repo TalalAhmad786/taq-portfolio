@@ -11,6 +11,7 @@ import AdminDashboard from "@/pages/admin-dashboard";
 import Header from "@/components/Header";
 import Loader from "@/components/Loader";
 import BackToTop from "@/components/BackToTop";
+import CustomCursor from "@/components/CustomCursor";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
@@ -23,7 +24,7 @@ function App() {
     // Simulating page load time
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 2000);
+    }, 5000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -37,6 +38,16 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <TooltipProvider>
+            <CustomCursor
+                config={{
+                  dotSize: 8,
+                  ringSize: 40,
+                  dotColor: "hsl(var(--primary))",
+                  ringColor: "hsl(var(--primary))",
+                  speed: 1,
+                  magneticForce: 0.5,
+                }}
+              />
             <div className="min-h-screen flex flex-col">
               <Header />
               <main className="flex-grow">

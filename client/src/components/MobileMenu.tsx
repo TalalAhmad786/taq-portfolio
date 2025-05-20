@@ -11,9 +11,43 @@ interface MobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
   links: Link[];
+  activeSection: string;
 }
 
-const MobileMenu = ({ isOpen, onClose, links }: MobileMenuProps) => {
+const MobileMenu = ({ isOpen, onClose, links, activeSection }: MobileMenuProps) => {
+  const menuVariants = {
+    hidden: { x: "100%", opacity: 0 },
+    visible: { 
+      x: 0, 
+      opacity: 1,
+      transition: {
+        type: "spring",
+        damping: 25,
+        stiffness: 200,
+        staggerChildren: 0.1,
+        when: "beforeChildren"
+      }
+    },
+    exit: { 
+      x: "100%", 
+      opacity: 0,
+      transition: {
+        type: "spring",
+        damping: 25,
+        stiffness: 200,
+        staggerChildren: 0.05,
+        staggerDirection: -1,
+        when: "afterChildren"
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { x: 20, opacity: 0 },
+    visible: { x: 0, opacity: 1 },
+    exit: { x: 20, opacity: 0 }
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -24,56 +58,73 @@ const MobileMenu = ({ isOpen, onClose, links }: MobileMenuProps) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-background/50 backdrop-blur-sm z-50 md:hidden"
+            className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 md:hidden"
             onClick={onClose}
           />
           
           {/* Menu */}
           <motion.div
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 h-full w-64 glass py-20 px-6 z-50 md:hidden"
+            variants={menuVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed top-0 right-0 h-full w-72 bg-background/95 backdrop-blur-sm border-l border-border z-50 md:hidden py-20 px-6 shadow-2xl"
           >
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 p-2 rounded-lg bg-card hover:bg-card/80 transition duration-300"
+              className="absolute top-4 right-4 p-2 rounded-lg hover:bg-muted transition duration-300"
               aria-label="Close menu"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6"
+              <motion.div
+                whileHover={{ rotate: 90 }}
+                transition={{ duration: 0.2 }}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </motion.div>
             </button>
             
-            <div className="flex flex-col space-y-6">
+            <nav className="flex flex-col space-y-1">
               {links.map((link, index) => (
-                <a
+                <motion.a
                   key={index}
                   href={link.href}
-                  className={`text-white transition duration-300 ${link.hoverColor}`}
+                  variants={itemVariants}
+                  className={`px-4 py-3 rounded-lg text-sm font-medium transition duration-300
+                    ${activeSection === link.href.slice(1)
+                      ? "bg-muted text-primary"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                    }`}
                   onClick={onClose}
                 >
                   {link.label}
-                </a>
+                </motion.a>
               ))}
-              
-              <div className="pt-4 flex items-center space-x-2">
+            </nav>
+            
+            <motion.div
+              variants={itemVariants}
+              className="absolute bottom-8 left-0 w-full px-6"
+            >
+              <div className="flex items-center justify-between p-4 rounded-lg bg-muted">
+                <span className="text-sm font-medium text-muted-foreground">
+                  Switch Theme
+                </span>
                 <ThemeToggle />
-                <span className="text-white">Toggle Theme</span>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         </>
       )}
