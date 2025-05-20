@@ -17,7 +17,7 @@ export default defineConfig({
         ]
       : []),
   ],
-  base: '/my-folio/public/',
+  base: '/taq-folio/public/',
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),
